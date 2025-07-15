@@ -73,13 +73,6 @@ STRING4 = getenv("STRING_SESSION4", None)
 STRING5 = getenv("STRING_SESSION5", None)
 
 
-# Bot introduction messages - These can be customized as per your preference
-AYU = [
-    "💞", "🦋", "🔍", "🧪", "🦋", "⚡️", "🔥", "🦋", "🎩", "🌈", "🍷", "🥂", "🦋", "🥃", "🥤", "🕊️",
-    "💞", "🐝", "🕊️", "🧪", "🕊️", "🔎", "🦋", "🎶", "🪄", "💌", "🌡️", "💞", "🧨"
-]
-
-
 BANNED_USERS = filters.user()
 adminlist = {}
 lyrical = {}
