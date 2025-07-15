@@ -17,8 +17,8 @@ BOT_TOKEN = getenv("BOT_TOKEN")
 MONGO_DB_URI = getenv("MONGO_DB_URI", None)
 
 # Vars For API End Pont.
-YTPROXY_URL = getenv("YTPROXY_URL", 'https://tgapi.xbitcode.com') ## E.G https://yt.okflix.
-YT_API_KEY = getenv("YT_API_KEY" , "xbit_0000557970017716954481" ) ## get your secret key from Vikky
+YTPROXY_URL = getenv("YTPROXY_URL", ') ## contact Deep @its_deep_ydv
+YT_API_KEY = getenv("YT_API_KEY" , "" ) ## get your secret key from Vikky
 
 DURATION_LIMIT_MIN = int(getenv("DURATION_LIMIT", 60))
 
