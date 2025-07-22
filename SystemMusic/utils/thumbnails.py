@@ -2,7 +2,8 @@ import os
 import subprocess
 import aiofiles
 import aiohttp
-from youtubesearchpython.future import VideosSearch
+from youtubesearchpython.__future__ import VideosSearch
+
 from config import YOUTUBE_IMG_URL
 
 async def get_thumb(videoid):
