@@ -7,6 +7,7 @@ async def get_thumb(videoid, thumb=None):
     try:
         query = f"https://www.youtube.com/watch?v={videoid}"
         results = VideosSearch(query, limit=1)
+        draw.text((1110, 8), unidecode(app.name), fill="white", font=arial)
         for result in (await results.next())["result"]:
             thumbnail = result["thumbnails"][0]["url"].split("?")[0]
         return thumbnail
