@@ -1,42 +1,33 @@
-import os
-import subprocess
-import aiofiles
-import aiohttp
-from youtubesearchpython.__future__ import VideosSearch
-
+import os, subprocess, aiofiles, aiohttp 
+from yt_dlp import YoutubeDL
 from config import YOUTUBE_IMG_URL
 
 async def get_thumb(videoid):
-    if os.path.isfile(f"cache/{videoid}.mp4"):
-        return f"cache/{videoid}.mp4"
+    # Check if the video is already cached
+    output_path = f"cache/{videoid}.mp4"
+    if os.path.isfile(output_path):
+        return output_path
 
     url = f"https://www.youtube.com/watch?v={videoid}"
     try:
-        results = VideosSearch(url, limit=1)
-        for result in (await results.next())["result"]:
-            thumbnail = result["thumbnails"][0]["url"].split("?")[0]
+        # yt-dlp configuration
+        ydl_opts = {
+            'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+            'outtmpl': f"cache/{videoid}.%(ext)s",
+            'merge_output_format': 'mp4',
+            'quiet': True,
+        }
 
-        async with aiohttp.ClientSession() as session:
-            async with session.get(thumbnail) as resp:
-                if resp.status == 200:
-                    f = await aiofiles.open(f"cache/thumb{videoid}.png", mode="wb")
-                    await f.write(await resp.read())
-                    await f.close()
+        # Download the video using yt-dlp
+        with YoutubeDL(ydl_opts) as ydl:
+            ydl.download([url])
 
-        # Convert the thumbnail image to a 5-second MP4 video using FFmpeg
-        output_video = f"cache/{videoid}.mp4"
-        ffmpeg_cmd = [
-            "ffmpeg", "-loop", "1", "-i", f"cache/thumb{videoid}.png",
-            "-c:v", "libx264", "-t", "5", "-pix_fmt", "yuv420p",
-            "-vf", "scale=1280:720", output_video
-        ]
-        subprocess.run(ffmpeg_cmd, check=True)
+        # Verify the downloaded file exists
+        if os.path.isfile(output_path):
+            return output_path
+        else:
+            return YOUTUBE_IMG_URL
 
-        try:
-            os.remove(f"cache/thumb{videoid}.png")
-        except:
-            pass
-
-        return output_video
-    except Exception:
+    except Exception as e:
+        print(f"Error downloading video: {e}")
         return YOUTUBE_IMG_URL
