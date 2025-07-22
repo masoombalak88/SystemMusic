@@ -43,6 +43,9 @@ GIT_TOKEN = getenv(
     "GIT_TOKEN", None
 )  # Fill this variable if your upstream repository is private
 
+# A name for your Music bot.
+MUSIC_BOT_NAME = getenv("𝗦𝗬𝗦𝗧𝗘𝗠 𝗠𝗨𝗦𝗜𝗖")
+
 SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/System_network_support")
 SUPPORT_CHAT = getenv("SUPPORT_CHAT", "https://t.me/Exampurrs")
 
