@@ -1,4 +1,15 @@
-<img src="https://readme-typing-svg.herokuapp.com?color=FF0000&width=420&lines=🧋+Ⓢ︎Ⓨ︎Ⓢ︎Ⓣ︎Ⓔ︎Ⓜ︎+Ⓜ︎Ⓤ︎Ⓢ︎Ⓘ︎Ⓒ︎+🧋">
+<h2 align="center">
+    ─「 𝐒ʏsᴛᴇᴍ 𝘅 𝐌ᴜsɪᴄ 」─
+
+</h2>
+
+[![Typing SVG](https://readme-typing-svg.herokuapp.com/?lines=ㅤ+𝚆𝙴𝙻𝙲𝙾𝙼𝙴+𝚃𝙾+𝚂𝚈𝚂𝚃𝙴𝙼+𝙼𝚄𝚂𝙸𝙲+𝚁𝙴𝙿𝙾+;ㅤ+𝚃𝙷𝙸𝚂+𝙸𝚂+𝙰+𝙰𝙳𝚅𝙰𝙽𝙲𝙴+𝙼𝚄𝚂𝙸𝙲+𝙱𝙾𝚃;𝙿𝙾𝚆𝙴𝚁𝙴𝙳+𝙱𝚈+☞+𝗦𝗬𝗦𝗧𝗘𝗠+𝗡𝗘𝗧𝗪𝗢𝗥𝗞)](https://github.com/masoombalak88/SystemMusic)
+
+
+
+<p align="center">
+  <img src="https://files.catbox.moe/m0a0ii.jpg">
+</p>
 
 <h3 align="center">
     ─「 ɪғ ᴀɴʏ ɪssᴜᴇ ɪɴ ʀᴇᴘᴏ ᴛʜᴇɴ ᴄᴏɴᴛᴀᴄᴛ 」─
