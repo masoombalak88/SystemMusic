@@ -31,3 +31,4 @@ async def play_logs(message, streamtype):
             except:
                 pass
         return
+LOGGER = logging.getLogger("Radhaa_Music_Bot")
