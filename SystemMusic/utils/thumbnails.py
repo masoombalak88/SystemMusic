@@ -157,7 +157,7 @@ def get_duration(duration: int, time: str = "0:24") -> str:
         return "0:00"
 
 
-async def gen_thumb(song: CachedTrack) -> str:
+async def get_thumb(song: CachedTrack) -> str:
     """
     Generates and saves a thumbnail for the song.
     """
