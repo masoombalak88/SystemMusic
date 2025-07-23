@@ -5,7 +5,7 @@ import httpx
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont, ImageOps
 from aiofiles.os import path as aiopath
 
-from ._dataclass import CachedTrack
+from SystemMusic.utils._dataclass import CachedTrack
 from SystemMusic.logger import LOGGER
 
 FONTS = {
