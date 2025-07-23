@@ -6,13 +6,13 @@ from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont, ImageOps
 from aiofiles.os import path as aiopath
 
 from ._dataclass import CachedTrack
-from TgMusic.logger import LOGGER
+from SystemMusic.logger import LOGGER
 
 FONTS = {
-    "cfont": ImageFont.truetype("TgMusic/modules/utils/cfont.ttf", 15),
-    "dfont": ImageFont.truetype("TgMusic/modules/utils/font2.otf", 12),
-    "nfont": ImageFont.truetype("TgMusic/modules/utils/font.ttf", 10),
-    "tfont": ImageFont.truetype("TgMusic/modules/utils/font.ttf", 20),
+    "cfont": ImageFont.truetype("SystemMusic/assets/cfont.ttf", 15),
+    "dfont": ImageFont.truetype("SystemMusic/assets/font2.otf", 12),
+    "nfont": ImageFont.truetype("SystemMusic/assets/font.ttf", 10),
+    "tfont": ImageFont.truetype("SystemMusic/assets/font.ttf", 20),
 }
 
 
@@ -104,7 +104,7 @@ def add_controls(img: Image.Image) -> Image.Image:
     box = (120, 120, 520, 480)
 
     region = img.crop(box)
-    controls = Image.open("TgMusic/modules/utils/controls.png").convert("RGBA")
+    controls = Image.open("SystemMusic/assets/controls.png").convert("RGBA")
     dark_region = ImageEnhance.Brightness(region).enhance(0.5)
 
     mask = Image.new("L", dark_region.size, 0)
