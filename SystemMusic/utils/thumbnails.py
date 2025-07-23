@@ -6,7 +6,7 @@ from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont, ImageOps
 from aiofiles.os import path as aiopath
 
 from SystemMusic.utils._dataclass import CachedTrack
-from SystemMusic.utils.logger import LOGGER
+from SystemMusic.logging import LOGGER
 
 FONTS = {
     "cfont": ImageFont.truetype("SystemMusic/assets/cfont.ttf", 15),
