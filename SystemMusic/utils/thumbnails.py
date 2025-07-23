@@ -10,7 +10,7 @@ from SystemMusic.logging import LOGGER
 
 FONTS = {
     "cfont": ImageFont.truetype("SystemMusic/assets/cfont.ttf", 15),
-    "dfont": ImageFont.truetype("SystemMusic/assets/font2.otf", 12),
+    "dfont": ImageFont.truetype("SystemMusic/assets/font2.ttf", 12),
     "nfont": ImageFont.truetype("SystemMusic/assets/font.ttf", 10),
     "tfont": ImageFont.truetype("SystemMusic/assets/font.ttf", 20),
 }
