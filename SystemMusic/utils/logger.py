@@ -1,5 +1,5 @@
 from pyrogram.enums import ParseMode
-import logging
+
 from SystemMusic import app
 from SystemMusic.utils.database import is_on_off
 from config import LOGGER_ID
@@ -31,4 +31,3 @@ async def play_logs(message, streamtype):
             except:
                 pass
         return
-LOGGER = logging.getLogger("Radhaa_Music_Bot")
