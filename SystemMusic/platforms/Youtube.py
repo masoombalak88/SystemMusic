@@ -1,15 +1,15 @@
-import asyncio, httpx, os, re, yt_dlp
-
+import asyncio
+import os
+import re
 from typing import Union
-from pyrogram.types import Message
+
+import yt_dlp
 from pyrogram.enums import MessageEntityType
+from pyrogram.types import Message
 from youtubesearchpython.__future__ import VideosSearch
+
 from SystemMusic.utils.database import is_on_off
 from SystemMusic.utils.formatters import time_to_seconds
-
-def time_to_seconds(time):
-    stringt = str(time)
-    return sum(int(x) * 60**i for i, x in enumerate(reversed(stringt.split(":"))))
 
 
 async def shell_cmd(cmd):
@@ -27,7 +27,6 @@ async def shell_cmd(cmd):
     return out.decode("utf-8")
 
 
-
 async def get_stream_url(query, video=False):
     api_url = "http://47.129.201.23:2020/try"
     
@@ -37,8 +36,25 @@ async def get_stream_url(query, video=False):
         if response.status_code != 200:
             return ""
         info = response.json()
-        return info.get("stream_url")
+        return info.get("link")
 
+
+async def get_direct_audio(tg_url: str):
+    if not tg_url:
+        return None
+    cmd = f'yt-dlp -g -f "bestaudio/best" --no-warnings --quiet "{tg_url}"'
+    out = await shell_cmd(cmd)
+    lines = [line.strip() for line in out.split('\n') if line.strip()]
+    return lines[0] if lines else None
+
+
+async def get_direct_video(tg_url: str):
+    if not tg_url:
+        return None
+    cmd = f'yt-dlp -g -f "best" --no-warnings --quiet "{tg_url}"'
+    out = await shell_cmd(cmd)
+    lines = [line.strip() for line in out.split('\n') if line.strip()]
+    return lines[0] if lines else None
 
 
 class YouTubeAPI:
@@ -133,9 +149,9 @@ class YouTubeAPI:
             link = self.base + link
         if "&" in link:
             link = link.split("&")[0]
-            
-        return await get_stream_url(link, True)
-        
+        tg_url = await get_stream_url(link, True)
+        direct_url = await get_direct_video(tg_url)
+        return direct_url or ""
 
     async def playlist(self, link, limit, user_id, videoid: Union[bool, str] = None):
         if videoid:
@@ -244,66 +260,31 @@ class YouTubeAPI:
             link = self.base + link
         loop = asyncio.get_running_loop()
 
-        def audio_dl():
+        def song_video_dl_from_tg(tg_url: str, title: str):
+            if not tg_url or not title:
+                return None
             ydl_optssx = {
-                "format": "bestaudio/best",
-                "outtmpl": "downloads/%(id)s.%(ext)s",
-                "geo_bypass": True,
-                "nocheckcertificate": True,
+                "format": "best",
+                "outtmpl": f"downloads/{title}.%(ext)s",
                 "quiet": True,
                 "no_warnings": True,
-            }
-            x = yt_dlp.YoutubeDL(ydl_optssx)
-            info = x.extract_info(link, False)
-            xyz = os.path.join("downloads", f"{info['id']}.{info['ext']}")
-            if os.path.exists(xyz):
-                return xyz
-            x.download([link])
-            return xyz
-
-        def video_dl():
-            ydl_optssx = {
-                "format": "(bestvideo[height<=?720][width<=?1280][ext=mp4])+(bestaudio[ext=m4a])",
-                "outtmpl": "downloads/%(id)s.%(ext)s",
-                "geo_bypass": True,
-                "nocheckcertificate": True,
-                "quiet": True,
-                "no_warnings": True,
-            }
-            x = yt_dlp.YoutubeDL(ydl_optssx)
-            info = x.extract_info(link, False)
-            xyz = os.path.join("downloads", f"{info['id']}.{info['ext']}")
-            if os.path.exists(xyz):
-                return xyz
-            x.download([link])
-            return xyz
-
-        def song_video_dl():
-            formats = f"{format_id}+140"
-            fpath = f"downloads/{title}"
-            ydl_optssx = {
-                "format": formats,
-                "outtmpl": fpath,
-                "geo_bypass": True,
-                "nocheckcertificate": True,
-                "quiet": True,
-                "no_warnings": True,
-                "prefer_ffmpeg": True,
                 "merge_output_format": "mp4",
             }
             x = yt_dlp.YoutubeDL(ydl_optssx)
-            x.download([link])
+            x.download([tg_url])
+            fpath = f"downloads/{title}.mp4"
+            if os.path.exists(fpath):
+                return fpath
+            return None
 
-        def song_audio_dl():
-            fpath = f"downloads/{title}.%(ext)s"
+        def song_audio_dl_from_tg(tg_url: str, title: str):
+            if not tg_url or not title:
+                return None
             ydl_optssx = {
-                "format": format_id,
-                "outtmpl": fpath,
-                "geo_bypass": True,
-                "nocheckcertificate": True,
+                "format": "bestaudio/best",
+                "outtmpl": f"downloads/{title}.%(ext)s",
                 "quiet": True,
                 "no_warnings": True,
-                "prefer_ffmpeg": True,
                 "postprocessors": [
                     {
                         "key": "FFmpegExtractAudio",
@@ -313,21 +294,26 @@ class YouTubeAPI:
                 ],
             }
             x = yt_dlp.YoutubeDL(ydl_optssx)
-            x.download([link])
+            x.download([tg_url])
+            fpath = f"downloads/{title}.mp3"
+            if os.path.exists(fpath):
+                return fpath
+            return None
 
         if songvideo:
-            await loop.run_in_executor(None, song_video_dl)
-            fpath = f"downloads/{title}.mp4"
-            return fpath
+            tg_url = await get_stream_url(link, True)
+            fpath = await loop.run_in_executor(None, song_video_dl_from_tg, tg_url, title)
+            return fpath or ""
         elif songaudio:
-            await loop.run_in_executor(None, song_audio_dl)
-            fpath = f"downloads/{title}.mp3"
-            return fpath
+            tg_url = await get_stream_url(link, False)
+            fpath = await loop.run_in_executor(None, song_audio_dl_from_tg, tg_url, title)
+            return fpath or ""
         elif video:
-            downloaded_file = await get_stream_url(link, True)
+            tg_url = await get_stream_url(link, True)
+            downloaded_file = await get_direct_video(tg_url)
             direct = None
         else:
+            tg_url = await get_stream_url(link, False)
+            downloaded_file = await get_direct_audio(tg_url)
             direct = None
-            downloaded_file = await get_stream_url(link, False)
         return downloaded_file, direct
-        
