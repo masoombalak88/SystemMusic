@@ -1,5 +1,3 @@
-#FUCK TG 
-
 import asyncio
 import aiohttp
 import os
@@ -345,23 +343,6 @@ class YouTubeAPI:
                         return local_path  # direct=False
                 return tg_link  # fallback direct if not TG
 
-            try:
-                async with aiohttp.ClientSession() as session:
-                    async with session.get(f"https://yt.okflix.top/api/{vid_id}") as resp:
-                        response = await resp.json()
-                    if response.get('status') == 'success':
-                        fpath = f"downloads/{vid_id}.mp3"
-                        if os.path.exists(fpath):
-                            return fpath
-                        download_link = response.get('download_link')
-                        async with session.get(download_link) as d_resp:
-                            if d_resp.status == 200:
-                                content = await d_resp.read()
-                                with open(fpath, "wb") as f:
-                                    f.write(content)
-                                return fpath
-            except Exception as e:
-                print("Async audio_dl error:", e)
             # Fallback using yt_dlp
             ydl_opts = {
                 "format": "bestaudio/best",
