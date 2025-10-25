@@ -16,9 +16,9 @@ from youtubesearchpython.__future__ import VideosSearch
 from SystemMusic.utils.database import is_on_off
 from SystemMusic.utils.formatters import time_to_seconds
 
-# Global caching for cookie file path and video info
+
 _cached_cookie = None
-_info_cache = {}  # Cache ke liye: { link: info }
+_info_cache = {}  
 
 def cookie_txt_file():
     global _cached_cookie
@@ -65,7 +65,6 @@ def parse_tg_link(link: str) -> Tuple[Optional[str], Optional[int]]:
 
 
 async def fetch_song(query: str, streamtype: str) -> dict:
-    """API se song/video download link fetch karta hai"""
     api_url = "http://47.129.201.23:2020/try"
     vid = "true" if streamtype.lower() == "video" else "false"
     params = {"query": query, "vid": vid}
@@ -82,14 +81,13 @@ async def fetch_song(query: str, streamtype: str) -> dict:
 
 
 async def download_tg_media(tg_link: str) -> Optional[str]:
-    """TG link se media download karta hai locally"""
-    # Parse TG link
+    # Tg
     c_username, message_id = parse_tg_link(tg_link)
     if not c_username or not message_id:
         print(f"Failed to parse TG link: {tg_link}")
         return None
 
-    # Assume c_username is username or id
+    # id
     if c_username.startswith("@"):
         c_username = c_username[1:]
 
@@ -105,7 +103,7 @@ async def download_tg_media(tg_link: str) -> Optional[str]:
             print(f"No filex in TG message")
             return None
 
-        # Make filepath like Telegram.py
+        # file path
         if msg.audio:
             file_name = f"{filex.file_unique_id}.{filex.file_name.split('.')[-1] if filex.file_name else 'ogg'}"
         elif msg.video or msg.document:
@@ -138,13 +136,6 @@ class YouTubeAPI:
         self.listbase = "https://youtube.com/playlist?list="
 
     async def get_download_link(self, query: str, video_stream: bool = False) -> Tuple[Optional[str], Optional[int], Optional[str]]:
-        """
-        Query se song fetch karke telegram link parse karta hai
-        
-        Returns:
-            Tuple of (username, message_id, error_message)
-            Agar success hai to error_message None hoga
-        """
         streamtype = "video" if video_stream else "audio"
         song_data = await fetch_song(query, streamtype)
 
@@ -231,7 +222,7 @@ class YouTubeAPI:
         if "&" in link:
             link = link.split("&")[0]
 
-        # Blocking operation ko async thread mein chalaya
+        # video
         def get_video_url():
             info = extract_video_info(link)
             for fmt in info.get("formats", []):
@@ -330,7 +321,6 @@ class YouTubeAPI:
 
         # Asynchronous audio download using aiohttp
         async def audio_dl():
-            # Pehle API try karenge TG link ke liye
             query = await self.title(link, videoid)
             streamtype = "audio"
             song_data = await fetch_song(query, streamtype)
@@ -413,7 +403,7 @@ class YouTubeAPI:
                 ydl.download([link])
 
         if songvideo:
-            # API try karenge
+            # API 
             query = title
             streamtype = "video"
             song_data = await fetch_song(query, streamtype)
@@ -428,7 +418,7 @@ class YouTubeAPI:
             await loop.run_in_executor(None, song_video_dl)
             return f"downloads/{title}.mp4", False
         elif songaudio:
-            # API try karenge
+            # API 
             query = title
             streamtype = "audio"
             song_data = await fetch_song(query, streamtype)
@@ -443,7 +433,7 @@ class YouTubeAPI:
             await loop.run_in_executor(None, song_audio_dl)
             return f"downloads/{title}.mp3", False
         elif video:
-            # Pehle API try karenge TG link ke liye
+            # TG link 
             query = await self.title(link, videoid)
             streamtype = "video"
             song_data = await fetch_song(query, streamtype)
