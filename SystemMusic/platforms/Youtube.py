@@ -37,7 +37,6 @@ def cookie_txt_file():
     return _cached_cookie
 
 def extract_video_info(link: str) -> dict:
-    # Agar info cache mein hai, use kar lo
     if link in _info_cache:
         return _info_cache[link]
     ytdl_opts = {
@@ -48,9 +47,6 @@ def extract_video_info(link: str) -> dict:
         info = ydl.extract_info(link, download=False)
     _info_cache[link] = info
     return info
-
-
-# ============ NEW FUNCTIONS ADDED ============
 
 def parse_tg_link(link: str) -> Tuple[Optional[str], Optional[int]]:
     """Telegram link se chat username aur message ID extract karta hai"""
@@ -73,21 +69,19 @@ async def fetch_song(query: str, streamtype: str) -> dict:
         async with aiohttp.ClientSession() as session:
             async with session.get(api_url, params=params) as response:
                 data = await response.json()
-                print(f"API response: {data}")  # Debug log
+                print(f"API response: {data}") 
                 return data
     except Exception as e:
-        print(f"API error: {e}")  # Debug log
+        print(f"API error: {e}") 
         return {"error": str(e)}
 
 
 async def download_tg_media(tg_link: str) -> Optional[str]:
-    # Tg
     c_username, message_id = parse_tg_link(tg_link)
     if not c_username or not message_id:
         print(f"Failed to parse TG link: {tg_link}")
         return None
 
-    # id
     if c_username.startswith("@"):
         c_username = c_username[1:]
 
@@ -103,7 +97,6 @@ async def download_tg_media(tg_link: str) -> Optional[str]:
             print(f"No filex in TG message")
             return None
 
-        # file path
         if msg.audio:
             file_name = f"{filex.file_unique_id}.{filex.file_name.split('.')[-1] if filex.file_name else 'ogg'}"
         elif msg.video or msg.document:
@@ -117,7 +110,6 @@ async def download_tg_media(tg_link: str) -> Optional[str]:
             print(f"File already exists: {fname}")
             return fname
 
-        # Download
         await app.download_media(msg, fname)
         print(f"Downloaded TG media to: {fname}")
         return fname
@@ -222,12 +214,10 @@ class YouTubeAPI:
         if "&" in link:
             link = link.split("&")[0]
 
-        # video
         def get_video_url():
             info = extract_video_info(link)
             for fmt in info.get("formats", []):
                 if fmt.get("format_id") and fmt.get("url"):
-                    # Resolution filter
                     if fmt.get("height", 0) <= 720 and fmt.get("width", 0) <= 1280:
                         return 1, fmt["url"]
             return 0, "No suitable format found."
@@ -277,7 +267,6 @@ class YouTubeAPI:
                 if "dash" in fmt.get("format", "").lower():
                     continue
                 try:
-                    # Check required keys
                     _ = fmt["filesize"]
                     _ = fmt["format_id"]
                     _ = fmt["ext"]
@@ -318,8 +307,6 @@ class YouTubeAPI:
             link = self.base + link
 
         loop = asyncio.get_running_loop()
-
-        # Asynchronous audio download using aiohttp
         async def audio_dl():
             query = await self.title(link, videoid)
             streamtype = "audio"
@@ -330,10 +317,8 @@ class YouTubeAPI:
                 if tg_link.startswith("https://t.me/"):
                     local_path = await download_tg_media(tg_link)
                     if local_path:
-                        return local_path  # direct=False
-                return tg_link  # fallback direct if not TG
-
-            # Fallback using yt_dlp
+                        return local_path
+                return tg_link 
             ydl_opts = {
                 "format": "bestaudio/best",
                 "outtmpl": "downloads/%(id)s.%(ext)s",
@@ -403,7 +388,6 @@ class YouTubeAPI:
                 ydl.download([link])
 
         if songvideo:
-            # API 
             query = title
             streamtype = "video"
             song_data = await fetch_song(query, streamtype)
@@ -414,11 +398,10 @@ class YouTubeAPI:
                     local_path = await download_tg_media(tg_link)
                     if local_path:
                         return local_path, False
-                return tg_link, True  # fallback
+                return tg_link, True
             await loop.run_in_executor(None, song_video_dl)
             return f"downloads/{title}.mp4", False
         elif songaudio:
-            # API 
             query = title
             streamtype = "audio"
             song_data = await fetch_song(query, streamtype)
@@ -429,11 +412,10 @@ class YouTubeAPI:
                     local_path = await download_tg_media(tg_link)
                     if local_path:
                         return local_path, False
-                return tg_link, True  # fallback
+                return tg_link, True 
             await loop.run_in_executor(None, song_audio_dl)
             return f"downloads/{title}.mp3", False
         elif video:
-            # TG link 
             query = await self.title(link, videoid)
             streamtype = "video"
             song_data = await fetch_song(query, streamtype)
@@ -444,7 +426,7 @@ class YouTubeAPI:
                     local_path = await download_tg_media(tg_link)
                     if local_path:
                         downloaded_file = local_path
-                        direct = False  # local file
+                        direct = False 
                     else:
                         downloaded_file = tg_link
                         direct = True
@@ -456,7 +438,6 @@ class YouTubeAPI:
                     downloaded_file = await loop.run_in_executor(None, video_dl)
                     direct = True
                 else:
-                    # Fallback: try using video_dl directly
                     downloaded_file = await loop.run_in_executor(None, video_dl)
                     direct = True
         else:
