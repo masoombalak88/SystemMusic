@@ -69,17 +69,14 @@ async def fetch_song(query: str, streamtype: str) -> dict:
         async with aiohttp.ClientSession() as session:
             async with session.get(api_url, params=params) as response:
                 data = await response.json()
-                print(f"API response: {data}") 
                 return data
     except Exception as e:
-        print(f"API error: {e}") 
         return {"error": str(e)}
 
 
 async def download_tg_media(tg_link: str) -> Optional[str]:
     c_username, message_id = parse_tg_link(tg_link)
     if not c_username or not message_id:
-        print(f"Failed to parse TG link: {tg_link}")
         return None
 
     if c_username.startswith("@"):
@@ -89,12 +86,10 @@ async def download_tg_media(tg_link: str) -> Optional[str]:
         app = __import__("SystemMusic", fromlist=["app"]).app
         msg = await app.get_messages(c_username, message_id)
         if not msg or not msg.media:
-            print(f"No media in TG message: {tg_link}")
             return None
 
         filex = msg.audio or msg.video or msg.document
         if not filex:
-            print(f"No filex in TG message")
             return None
 
         if msg.audio:
@@ -102,20 +97,16 @@ async def download_tg_media(tg_link: str) -> Optional[str]:
         elif msg.video or msg.document:
             file_name = f"{filex.file_unique_id}.{filex.file_name.split('.')[-1] if filex.file_name else 'mp4'}"
         else:
-            print("Not audio/video")
             return None
 
         fname = os.path.join("downloads", file_name)
         if os.path.exists(fname):
-            print(f"File already exists: {fname}")
             return fname
 
         await app.download_media(msg, fname)
-        print(f"Downloaded TG media to: {fname}")
         return fname
 
     except Exception as e:
-        print(f"Error downloading TG media: {e}")
         return None
 
 # =============================================
@@ -313,7 +304,6 @@ class YouTubeAPI:
             song_data = await fetch_song(query, streamtype)
             if song_data and "link" in song_data and not song_data.get("error"):
                 tg_link = song_data["link"]
-                print(f"API returned TG link: {tg_link}")
                 if tg_link.startswith("https://t.me/"):
                     local_path = await download_tg_media(tg_link)
                     if local_path:
@@ -393,7 +383,6 @@ class YouTubeAPI:
             song_data = await fetch_song(query, streamtype)
             if song_data and "link" in song_data and not song_data.get("error"):
                 tg_link = song_data["link"]
-                print(f"API returned TG link for songvideo: {tg_link}")
                 if tg_link.startswith("https://t.me/"):
                     local_path = await download_tg_media(tg_link)
                     if local_path:
@@ -407,7 +396,6 @@ class YouTubeAPI:
             song_data = await fetch_song(query, streamtype)
             if song_data and "link" in song_data and not song_data.get("error"):
                 tg_link = song_data["link"]
-                print(f"API returned TG link for songaudio: {tg_link}")
                 if tg_link.startswith("https://t.me/"):
                     local_path = await download_tg_media(tg_link)
                     if local_path:
@@ -421,7 +409,6 @@ class YouTubeAPI:
             song_data = await fetch_song(query, streamtype)
             if song_data and "link" in song_data and not song_data.get("error"):
                 tg_link = song_data["link"]
-                print(f"API returned TG link for video: {tg_link}")
                 if tg_link.startswith("https://t.me/"):
                     local_path = await download_tg_media(tg_link)
                     if local_path:
