@@ -13,7 +13,6 @@ import yt_dlp
 from pyrogram.enums import MessageEntityType
 from pyrogram.types import Message
 from youtubesearchpython.__future__ import VideosSearch
-from SystemMusic import app
 from SystemMusic.utils.database import is_on_off
 from SystemMusic.utils.formatters import time_to_seconds
 
@@ -84,6 +83,7 @@ async def download_tg_media(tg_link: str) -> Optional[str]:
         c_username = c_username[1:]
 
     try:
+        app = __import__("SystemMusic", fromlist=["app"]).app
         msg = await app.get_messages(c_username, message_id)
         if not msg or not msg.media:
             return None
